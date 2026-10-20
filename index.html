@@ -31,7 +31,7 @@ a{color:inherit;text-decoration:none}
 .soc a{width:26px;height:26px;border-radius:50%;background:#fff;color:var(--red);display:grid;place-items:center;font-size:11px;font-weight:800}
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--card);border-bottom:1px solid var(--line)}
 header .wrap{display:flex;align-items:center;justify-content:space-between;height:68px}
-.brand{display:flex;align-items:center;gap:10px;font:800 italic 26px "Barlow Condensed",sans-serif;color:var(--navy)}
+.brand{display:flex;align-items:center;gap:10px;font:800 italic 26px "Barlow Condensed",sans-serif;color:var(--text)}
 .brand img{height:50px;width:50px;object-fit:contain}
 .brand em{color:var(--red);font-style:italic}
 nav.top{display:flex;gap:26px;font-weight:600}
@@ -223,20 +223,18 @@ sch(today);
 var BASE="https://play14.tikast.com:20089";
 var CANDS=[BASE+"/stream",BASE+"/;",BASE+"/stream/1/",BASE+"/live",BASE+"/"],idx=0;
 var au=document.getElementById("au"),pb=document.getElementById("pb"),pl=document.getElementById("pl"),sg=document.getElementById("song");
-function toggle(){
- if(au.paused){idx=0;sg.textContent="Conectando…";au.src=CANDS[0];au.play().catch(function(){})}
- else{au.pause();au.removeAttribute("src");au.load();sg.textContent="La Z Latina · Siempre encendida"}
-}
+var on=false,hp=document.getElementById("heroPlay");
+function ui(p){on=p;pb.textContent=p?"❚❚":"▶";pb.setAttribute("aria-label",p?"Pausar":"Reproducir");hp.textContent=p?"❚❚ Pausar":"▶ Escuchar en vivo";pl.classList.toggle("playing",p)}
+function start(){idx=0;sg.textContent="Conectando…";au.src=CANDS[0];au.play().catch(function(){})}
+function stop(){au.pause();au.removeAttribute("src");au.load();sg.textContent="La Z Latina · Siempre encendida"}
+function toggle(){if(on){ui(false);stop()}else{ui(true);start()}}
 au.onerror=function(){
  if(!au.getAttribute("src"))return;
  if(idx<CANDS.length-1){idx++;au.src=CANDS[idx];au.play().catch(function(){})}
- else{ui(false);sg.textContent="No se pudo conectar con la emisora";au.removeAttribute("src")}
+ else{ui(false);au.removeAttribute("src");sg.textContent="No se pudo conectar con la emisora"}
 };
 au.onplaying=function(){sg.textContent="La Z Latina · En vivo"};
-var hp=document.getElementById("heroPlay");
-function ui(p){pb.textContent=p?"❚❚":"▶";pb.setAttribute("aria-label",p?"Pausar":"Reproducir");hp.textContent=p?"❚❚ Pausar":"▶ Escuchar en vivo";pl.classList.toggle("playing",p)}
-au.onplay=function(){ui(true)};au.onpause=function(){ui(false)};
-pb.onclick=document.getElementById("heroPlay").onclick=toggle;
+pb.onclick=hp.onclick=toggle;
 document.getElementById("vol").oninput=function(e){au.volume=e.target.value};
 document.getElementById("f").onsubmit=function(e){e.preventDefault();document.getElementById("ok").textContent="¡Gracias! Recibimos tu mensaje.";e.target.reset()};
 </script>
